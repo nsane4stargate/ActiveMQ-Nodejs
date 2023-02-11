@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+    pg:
+        container_name: pg_container
+        image: postgres:14.1-alpine3.15
+        restart: always
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_HOST_AUTH_METHOD: trust
+            POSTGRES_PASSWORD: postgres
+            PGUSER: postgres
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        ports:
+            - "5432:5432"
+        volumes:
+            - "${PWD}/data/initdb/:/docker-entrypoint-initdb.d/"
+    pgadmin:
+        container_name: pgadmin_container
+        image: dpage/pgadmin4:6.4
+        restart: always
+        environment:
+            PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
+            PGADMIN_DEFAULT_PASSWORD: admin
+            PGADMIN_LISTEN_PORT: 5433
+            PGADMIN_CONFIG_SERVER_MODE: "False"
+            PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+            PGADMIN_CONFIG_UPGRADE_CHECK_ENABLED: "False"
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        ports:
+            - "5433:5433"
+        depends_on:
+            - pg
+networks:
+    default:
+        name: nunet
